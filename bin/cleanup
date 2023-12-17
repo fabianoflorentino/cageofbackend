@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# stop and delete all containers
+docker compose down
+
+# delete image
+docker image rm fabianoflorentino/cageofbackend:0.0.1
+
+# clean up volumes
+while read -r ID;do docker volume rm "${ID}"; done <<< "$(docker volume ls |grep -v 'VOLUME' |awk '{ print $2 }')"

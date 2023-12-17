@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+def running?
+  pid_file = 'tmp/pids/server.pid'
+  return false unless File.exist?(pid_file)
+
+  pid = File.read(pid_file).to_i
+  true if Process.kill(0, pid)
+rescue Errno::ESRCH
+  false
+end
+
+def run
+  puts 'Starting server...'
+  system('bundle exec rails server -b 0.0.0.0')
+end
+
+def stop
+  pid_file = 'tmp/pids/server.pid'
+
+  return unless File.exist?(pid_file)
+
+  pid = File.read(pid_file).to_i
+
+  begin
+    puts 'Stopping rails server...' if Process.kill('TERM', pid) && File.delete(pid_file)
+  rescue Errno::ESRCH
+    puts 'No rails server is running...' if File.delete(pid_file)
+  end
+end
+
+def main
+  puts 'A server is already running' if running?
+  stop
+
+  run unless stop
+end
+
+main

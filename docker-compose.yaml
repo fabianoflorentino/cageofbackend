@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0-oracle
+    container_name: mysql
+    hostname: mysql
+    restart: always
+    cap_add:
+      - SYS_NICE
+    env_file:
+      - ./.env
+    ports:
+      - "${MYSQL_LOCAL_PORT}:3306"
+    volumes:
+      - data:/var/lib/mysql
+
+  mysql-init:
+    image: mysql:8.0-oracle
+    container_name: mysql-init
+    hostname: mysql-init
+    volumes:
+      - ./db/init.sql:/tmp/init.sql
+    env_file:
+      - ./.env
+    entrypoint: ["bash", "-c", "mysql --user=root --password=${MYSQL_ROOT_PASSWORD} --host=mysql --port=3306 < /tmp/init.sql && exit"]
+    depends_on:
+      - mysql
+    links:
+      - mysql
+
+  cageofbackend:
+    image: fabianoflorentino/cageofbackend:0.0.1
+    container_name: cageofbackend
+    hostname: cageofbackend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./.env
+    depends_on:
+      - mysql
+      - mysql-init
+    ports:
+      - ${RAILS_LOCAL_PORT}:3000
+    volumes:
+      - .:/app
+    links:
+      - mysql
+
+volumes:
+  data:
+    driver: local
