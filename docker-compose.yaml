@@ -4,6 +4,7 @@ services:
   mysql:
     image: mysql:8.0-oracle
     container_name: mysql
+    command: --authentication_policy=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     hostname: mysql
     restart: always
     cap_add:
@@ -23,10 +24,8 @@ services:
       - ./db/init.sql:/tmp/init.sql
     env_file:
       - ./.env
-    entrypoint: ["bash", "-c", "mysql --user=root --password=${MYSQL_ROOT_PASSWORD} --host=mysql --port=3306 < /tmp/init.sql && exit"]
+    entrypoint: ["bash", "-c", "sleep 30 && mysql --user=root --password=${MYSQL_ROOT_PASSWORD} --host=mysql --port=3306 < /tmp/init.sql && exit"]
     depends_on:
-      - mysql
-    links:
       - mysql
 
   cageofbackend:
@@ -47,6 +46,8 @@ services:
       - .:/app
     links:
       - mysql
+    tty: true
+    stdin_open: true
 
 volumes:
   data:
