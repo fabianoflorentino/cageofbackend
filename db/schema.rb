@@ -10,5 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 0) do
+ActiveRecord::Schema[7.0].define(version: 20_231_218_223_715) do
+  create_table 'pessoas', charset: 'utf8mb4', collation: 'utf8mb4_unicode_ci', force: :cascade do |t|
+    t.string 'apelido', limit: 32
+    t.string 'nome', limit: 100
+    t.date 'nascimento'
+    t.text 'stack'
+    t.datetime 'created_at', null: false
+    t.datetime 'updated_at', null: false
+    t.index ['apelido'], name: 'index_pessoas_on_apelido', unique: true
+  end
 end

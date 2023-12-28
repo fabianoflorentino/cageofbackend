@@ -21,10 +21,10 @@ services:
       retries: 3
       start_period: 5s
 
-  mysql-init:
+  database-init:
     image: mysql:8.0-oracle
-    container_name: mysql-init
-    hostname: mysql-init
+    container_name: database-init
+    hostname: database-init
     volumes:
       - ./db/init.sql:/tmp/init.sql
     env_file:
@@ -50,7 +50,7 @@ services:
       - ./.env
     depends_on:
       - mysql
-      - mysql-init
+      - database-init
     ports:
       - ${RAILS_LOCAL_PORT}:3000
     volumes:
